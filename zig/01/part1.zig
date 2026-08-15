@@ -9,7 +9,7 @@ pub fn main(init: std.process.Init) !void {
 
     const test_data = try std.Io.Dir.cwd().readFileAlloc(
         io,
-        "data/test2",
+        "data/test1",
         allocator,
         .unlimited,
     );
@@ -38,15 +38,31 @@ pub fn main(init: std.process.Init) !void {
 }
 
 fn solve(data: []const u8) !i32 {
+    var dial: i32 = 50;
     var res: i32 = 0;
 
     var it = std.mem.splitScalar(u8, data, '\n');
 
     while (it.next()) |line| {
         if (line.len == 0) continue;
-        res = 0;
-        std.debug.print("{s}\n", .{line});
+
+        dial = try parseMove(line, dial);
+
+        if (dial == 0) {
+            res += 1;
+        }
     }
 
     return res;
+}
+
+fn parseMove(line: []const u8, dial: i32) !i32 {
+    const dir = line[0];
+    const num = try std.fmt.parseInt(i32, line[1..], 10);
+
+    if (dir == 'R') {
+        return @mod(dial + num, 100);
+    } else {
+        return @mod(dial - num, 100);
+    }
 }
